@@ -14,13 +14,13 @@ def generate_launch_description():
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode = LaunchConfiguration('scan_mode', default='Standard')
 
-    # lidar1
-    lidar1_serial_port = LaunchConfiguration('lidar1_serial_port', default='/dev/ttyUSB1')
-    lidar1_frame_id = LaunchConfiguration('lidar1_frame_id', default='lidar1_laser')
+    # front lidar
+    front_serial_port = LaunchConfiguration('front_serial_port', default='/dev/rplidar_1')
+    front_frame_id = LaunchConfiguration('front_frame_id', default='front_laser')
 
-    # lidar2
-    lidar2_serial_port = LaunchConfiguration('lidar2_serial_port', default='/dev/ttyUSB2')
-    lidar2_frame_id = LaunchConfiguration('lidar2_frame_id', default='lidar2_laser')
+    # rear lidar
+    rear_serial_port = LaunchConfiguration('rear_serial_port', default='/dev/rplidar_2')
+    rear_frame_id = LaunchConfiguration('rear_frame_id', default='rear_laser')
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -49,34 +49,34 @@ def generate_launch_description():
             description='Specifying scan mode of lidar'),
 
         DeclareLaunchArgument(
-            'lidar1_serial_port',
-            default_value=lidar1_serial_port,
-            description='Serial port for lidar1'),
+            'front_serial_port',
+            default_value=front_serial_port,
+            description='Serial port for front lidar'),
 
         DeclareLaunchArgument(
-            'lidar1_frame_id',
-            default_value=lidar1_frame_id,
-            description='frame_id for lidar1'),
+            'front_frame_id',
+            default_value=front_frame_id,
+            description='frame_id for front lidar'),
 
         DeclareLaunchArgument(
-            'lidar2_serial_port',
-            default_value=lidar2_serial_port,
-            description='Serial port for lidar2'),
+            'rear_serial_port',
+            default_value=rear_serial_port,
+            description='Serial port for rear lidar'),
 
         DeclareLaunchArgument(
-            'lidar2_frame_id',
-            default_value=lidar2_frame_id,
-            description='frame_id for lidar2'),
+            'rear_frame_id',
+            default_value=rear_frame_id,
+            description='frame_id for rear lidar'),
 
         Node(
             package='sllidar_ros2',
             executable='sllidar_node',
-            namespace='lidar1',
+            namespace='front',
             name='sllidar_node',
             parameters=[{'channel_type': channel_type,
-                         'serial_port': lidar1_serial_port,
+                         'serial_port': front_serial_port,
                          'serial_baudrate': serial_baudrate,
-                         'frame_id': lidar1_frame_id,
+                         'frame_id': front_frame_id,
                          'inverted': inverted,
                          'angle_compensate': angle_compensate,
                          'scan_mode': scan_mode}],
@@ -85,12 +85,12 @@ def generate_launch_description():
         Node(
             package='sllidar_ros2',
             executable='sllidar_node',
-            namespace='lidar2',
+            namespace='rear',
             name='sllidar_node',
             parameters=[{'channel_type': channel_type,
-                         'serial_port': lidar2_serial_port,
+                         'serial_port': rear_serial_port,
                          'serial_baudrate': serial_baudrate,
-                         'frame_id': lidar2_frame_id,
+                         'frame_id': rear_frame_id,
                          'inverted': inverted,
                          'angle_compensate': angle_compensate,
                          'scan_mode': scan_mode}],
