@@ -15,11 +15,11 @@ def generate_launch_description():
     scan_mode = LaunchConfiguration('scan_mode', default='Standard')
 
     # front lidar
-    front_serial_port = LaunchConfiguration('front_serial_port', default='/dev/rplidar_1')
+    front_serial_port = LaunchConfiguration('front_serial_port', default='/dev/rplidar_2')
     front_frame_id = LaunchConfiguration('front_frame_id', default='front_laser')
 
     # rear lidar
-    rear_serial_port = LaunchConfiguration('rear_serial_port', default='/dev/rplidar_2')
+    rear_serial_port = LaunchConfiguration('rear_serial_port', default='/dev/rplidar_1')
     rear_frame_id = LaunchConfiguration('rear_frame_id', default='rear_laser')
 
     return LaunchDescription([
