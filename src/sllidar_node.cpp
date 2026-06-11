@@ -76,6 +76,8 @@ class SLlidarNode : public rclcpp::Node
         this->declare_parameter<std::string>("frame_id","laser_frame");
         this->declare_parameter<bool>("inverted", false);
         this->declare_parameter<bool>("angle_compensate", false);
+        this->declare_parameter<bool>("flip_180", false);
+        this->declare_parameter<float>("rear_clip_angle", 0.0f);
         this->declare_parameter<std::string>("scan_mode",std::string());
         this->declare_parameter<float>("scan_frequency",10);
         
@@ -89,6 +91,8 @@ class SLlidarNode : public rclcpp::Node
         this->get_parameter_or<std::string>("frame_id", frame_id, "laser_frame");
         this->get_parameter_or<bool>("inverted", inverted, false);
         this->get_parameter_or<bool>("angle_compensate", angle_compensate, false);
+        this->get_parameter_or<bool>("flip_180", flip_180, false);
+        this->get_parameter_or<float>("rear_clip_angle", rear_clip_angle, 0.0f);
         this->get_parameter_or<std::string>("scan_mode", scan_mode, std::string());
         if(channel_type == "udp")
             this->get_parameter_or<float>("scan_frequency", scan_frequency, 20.0);
@@ -221,6 +225,10 @@ class SLlidarNode : public rclcpp::Node
             scan_msg->angle_min =  M_PI - angle_min;
             scan_msg->angle_max =  M_PI - angle_max;
         }
+        if (flip_180) {   // lidar physically rotated 180 deg about Z -> offset all angles by pi
+            scan_msg->angle_min += M_PI;
+            scan_msg->angle_max += M_PI;
+        }
         scan_msg->angle_increment = (scan_msg->angle_max - scan_msg->angle_min) / (double)(node_count-1);
 
         scan_msg->scan_time = scan_time;
@@ -248,6 +256,21 @@ class SLlidarNode : public rclcpp::Node
                 else
                     scan_msg->ranges[node_count-1-i] = read_value;
                 scan_msg->intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
+            }
+        }
+
+        // Rear angular clip: drop beams within +/- rear_clip_angle of the rear (180 deg).
+        // Keeps angle_min/max/increment and ranges size unchanged; clipped beams -> inf.
+        if (rear_clip_angle > 0.0f) {
+            float half = DEG2RAD(rear_clip_angle);
+            for (size_t i = 0; i < node_count; i++) {
+                float a = scan_msg->angle_min + (float)i * scan_msg->angle_increment;
+                while (a >  M_PI) a -= 2.0f * M_PI;
+                while (a < -M_PI) a += 2.0f * M_PI;
+                if (std::fabs(a) >= (M_PI - half)) {
+                    scan_msg->ranges[i] = std::numeric_limits<float>::infinity();
+                    scan_msg->intensities[i] = 0.0f;
+                }
             }
         }
 
@@ -456,6 +479,8 @@ public:
     std::string frame_id;
     bool inverted = false;
     bool angle_compensate = true;
+    bool flip_180 = false;   // rotate scan 180 deg about Z (lidar mounted flipped)
+    float rear_clip_angle = 0.0;   // deg; >0 removes beams within +/- this angle of the rear (180 deg)
     float max_distance = 8.0;
     size_t angle_compensate_multiple = 1;//it stand of angle compensate at per 1 degree
     std::string scan_mode;

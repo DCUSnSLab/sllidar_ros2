@@ -17,6 +17,7 @@ def generate_launch_description():
     frame_id = LaunchConfiguration('frame_id', default='laser')
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
+    flip_180 = LaunchConfiguration('flip_180', default='false')
     scan_mode = LaunchConfiguration('scan_mode', default='Standard')
 
     return LaunchDescription([
@@ -51,6 +52,11 @@ def generate_launch_description():
             description='Specifying whether or not to enable angle_compensate of scan data'),
 
         DeclareLaunchArgument(
+            'flip_180',
+            default_value=flip_180,
+            description='Rotate scan 180 deg about Z (lidar mounted flipped)'),
+
+        DeclareLaunchArgument(
             'scan_mode',
             default_value=scan_mode,
             description='Specifying scan mode of lidar'),
@@ -63,8 +69,9 @@ def generate_launch_description():
                          'serial_port': serial_port, 
                          'serial_baudrate': serial_baudrate, 
                          'frame_id': frame_id,
-                         'inverted': inverted, 
-                         'angle_compensate': angle_compensate, 
+                         'inverted': inverted,
+                         'angle_compensate': angle_compensate,
+                         'flip_180': flip_180,
                          'scan_mode': scan_mode}],
             output='screen'),
     ])

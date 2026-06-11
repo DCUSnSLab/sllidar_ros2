@@ -13,14 +13,17 @@ def generate_launch_description():
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode = LaunchConfiguration('scan_mode', default='Standard')
+    rear_clip_angle = LaunchConfiguration('rear_clip_angle', default='80.0')
 
     # front lidar
     front_serial_port = LaunchConfiguration('front_serial_port', default='/dev/rplidar_2')
-    front_frame_id = LaunchConfiguration('front_frame_id', default='front_laser')
+    front_frame_id = LaunchConfiguration('front_frame_id', default='front_lidar')
+    front_flip_180 = LaunchConfiguration('front_flip_180', default='true')
 
     # rear lidar
     rear_serial_port = LaunchConfiguration('rear_serial_port', default='/dev/rplidar_1')
-    rear_frame_id = LaunchConfiguration('rear_frame_id', default='rear_laser')
+    rear_frame_id = LaunchConfiguration('rear_frame_id', default='rear_lidar')
+    rear_flip_180 = LaunchConfiguration('rear_flip_180', default='true')
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -49,6 +52,11 @@ def generate_launch_description():
             description='Specifying scan mode of lidar'),
 
         DeclareLaunchArgument(
+            'rear_clip_angle',
+            default_value=rear_clip_angle,
+            description='Remove beams within +/- this angle (deg) of the rear (180 deg); 0=off'),
+
+        DeclareLaunchArgument(
             'front_serial_port',
             default_value=front_serial_port,
             description='Serial port for front lidar'),
@@ -59,6 +67,11 @@ def generate_launch_description():
             description='frame_id for front lidar'),
 
         DeclareLaunchArgument(
+            'front_flip_180',
+            default_value=front_flip_180,
+            description='Rotate front scan 180 deg about Z (lidar mounted flipped)'),
+
+        DeclareLaunchArgument(
             'rear_serial_port',
             default_value=rear_serial_port,
             description='Serial port for rear lidar'),
@@ -67,6 +80,11 @@ def generate_launch_description():
             'rear_frame_id',
             default_value=rear_frame_id,
             description='frame_id for rear lidar'),
+
+        DeclareLaunchArgument(
+            'rear_flip_180',
+            default_value=rear_flip_180,
+            description='Rotate rear scan 180 deg about Z (lidar mounted flipped)'),
 
         Node(
             package='sllidar_ros2',
@@ -79,6 +97,8 @@ def generate_launch_description():
                          'frame_id': front_frame_id,
                          'inverted': inverted,
                          'angle_compensate': angle_compensate,
+                         'flip_180': front_flip_180,
+                         'rear_clip_angle': rear_clip_angle,
                          'scan_mode': scan_mode}],
             output='screen'),
 
@@ -93,6 +113,8 @@ def generate_launch_description():
                          'frame_id': rear_frame_id,
                          'inverted': inverted,
                          'angle_compensate': angle_compensate,
+                         'flip_180': rear_flip_180,
+                         'rear_clip_angle': rear_clip_angle,
                          'scan_mode': scan_mode}],
             output='screen'),
     ])
