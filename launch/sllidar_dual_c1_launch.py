@@ -13,7 +13,7 @@ def generate_launch_description():
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode = LaunchConfiguration('scan_mode', default='Standard')
-    rear_clip_angle = LaunchConfiguration('rear_clip_angle', default='80.0')
+    rear_clip_angle = LaunchConfiguration('rear_clip_angle', default='90.0')
 
     # front lidar
     front_serial_port = LaunchConfiguration('front_serial_port', default='/dev/rplidar_2')
